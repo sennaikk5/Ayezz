@@ -185,17 +185,17 @@ let isGenerating = false;
 
 function createEspacoPanel() {
     if (document.getElementById('axis-espaco-panel')) return;
-    const sheld = document.getElementById('sheld');
-    if (!sheld) return;
+    const body = document.body;
     espacoPanel = document.createElement('div');
     espacoPanel.id = 'axis-espaco-panel';
     espacoPanel.className = 'axis-espaco-panel';
     espacoPanel.innerHTML = `
-        <div class="axis-espaco-header">
-            <span class="axis-espaco-title">Espaço</span>
+        <div class="axis-espaco-header" id="axis-espaco-drag-handle">
+            <span class="axis-espaco-title">Spade</span>
             <div class="axis-espaco-header-actions">
                 <button id="axis-btn-mini-chat" class="axis-btn" title="Novo Mini-Chat">+Mini</button>
                 <button id="axis-btn-systems" class="axis-btn" title="Sistemas">⚙</button>
+                <button id="axis-btn-minimize" class="axis-btn" title="Minimizar">─</button>
                 <button id="axis-btn-toggle" class="axis-btn axis-btn-close">✕</button>
             </div>
         </div>
@@ -208,13 +208,14 @@ function createEspacoPanel() {
             <button id="axis-espaco-send" class="axis-btn axis-btn-send">Enviar</button>
         </div>
     `;
-    sheld.appendChild(espacoPanel);
+    body.appendChild(espacoPanel);
 
     espacoChatArea = document.getElementById('axis-espaco-chat');
     espacoInput = document.getElementById('axis-espaco-input');
     espacoSendBtn = document.getElementById('axis-espaco-send');
 
-    document.getElementById('axis-btn-toggle').addEventListener('click', toggleEspacoPanel);
+    document.getElementById('axis-btn-toggle').addEventListener('click', closeEspacoPanel);
+    document.getElementById('axis-btn-minimize').addEventListener('click', minimizeEspacoPanel);
     document.getElementById('axis-btn-mini-chat').addEventListener('click', createMiniChat);
     document.getElementById('axis-btn-systems').addEventListener('click', toggleSystemsPanel);
     espacoSendBtn.addEventListener('click', sendEspacoMessage);
@@ -225,26 +226,96 @@ function createEspacoPanel() {
         }
     });
 
+    setupDrag(espacoPanel, document.getElementById('axis-espaco-drag-handle'));
+
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'axis-toggle-btn';
     toggleBtn.className = 'axis-toggle-btn';
-    toggleBtn.textContent = 'Axis';
+    toggleBtn.innerHTML = 'S';
+    toggleBtn.title = 'Spade';
     toggleBtn.addEventListener('click', toggleEspacoPanel);
-    document.getElementById('right-nav-panel')?.appendChild(toggleBtn);
+    body.appendChild(toggleBtn);
+
+    const wasVisible = localStorage.getItem('axis_espaco_visible');
+    if (wasVisible !== 'false') {
+        espacoPanel.classList.add('axis-visible');
+        toggleBtn.classList.add('axis-active');
+    }
 
     renderEspacoChat();
     renderMiniChatBar();
     listenApprovalClicks();
 }
 
+function setupDrag(panel, handle) {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    handle.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.axis-espaco-header-actions')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = panel.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        panel.style.transition = 'none';
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        panel.style.left = (initialLeft + dx) + 'px';
+        panel.style.top = (initialTop + dy) + 'px';
+        panel.style.transform = 'none';
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        panel.style.transition = '';
+        document.body.style.userSelect = '';
+    });
+}
+
 function toggleEspacoPanel() {
     if (!espacoPanel) return;
-    const visible = espacoPanel.style.display !== 'none';
-    espacoPanel.style.display = visible ? 'none' : 'block';
+    const visible = espacoPanel.classList.contains('axis-visible');
+    if (visible) {
+        closeEspacoPanel();
+    } else {
+        openEspacoPanel();
+    }
+}
+
+function openEspacoPanel() {
+    if (!espacoPanel) return;
+    espacoPanel.classList.add('axis-visible');
     const btn = document.getElementById('axis-toggle-btn');
-    if (btn) btn.classList.toggle('axis-active', !visible);
-    if (!visible) renderEspacoChat();
-    localStorage.setItem('axis_espaco_visible', !visible);
+    if (btn) btn.classList.add('axis-active');
+    renderEspacoChat();
+    localStorage.setItem('axis_espaco_visible', 'true');
+}
+
+function closeEspacoPanel() {
+    if (!espacoPanel) return;
+    espacoPanel.classList.remove('axis-visible');
+    const btn = document.getElementById('axis-toggle-btn');
+    if (btn) btn.classList.remove('axis-active');
+    localStorage.setItem('axis_espaco_visible', 'false');
+}
+
+function minimizeEspacoPanel() {
+    if (!espacoPanel) return;
+    const body = espacoPanel.querySelector('.axis-espaco-body');
+    const footer = espacoPanel.querySelector('.axis-espaco-footer');
+    const isMinimized = body.style.display === 'none';
+    body.style.display = isMinimized ? '' : 'none';
+    footer.style.display = isMinimized ? '' : 'none';
+    const btn = document.getElementById('axis-btn-minimize');
+    if (btn) btn.textContent = isMinimized ? '─' : '□';
 }
 
 function toggleSystemsPanel() {
@@ -1068,10 +1139,6 @@ function importCharacterRecipe(file) {
 eventSource.on(event_types.APP_READY, () => {
     createEspacoPanel();
     createAprimorarIndicator();
-    const wasVisible = localStorage.getItem('axis_espaco_visible');
-    if (wasVisible === 'false' && espacoPanel) {
-        espacoPanel.style.display = 'none';
-    }
 });
 
 eventSource.on(event_types.CHAT_CHANGED, () => {
@@ -1100,4 +1167,4 @@ if (originalGenerateRaw) {
     };
 }
 
-console.log('[Axis] Extensão do Espaço carregada com sucesso.');
+console.log('[Spade] Extensão carregada com sucesso.');

@@ -1,40 +1,56 @@
 #axis-espaco-panel {
     position: fixed;
-    right: 0;
-    top: 0;
-    width: 380px;
-    height: 100vh;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    min-width: 320px;
+    max-width: 90vw;
+    height: 520px;
+    min-height: 280px;
+    max-height: 85vh;
     background: #1a1a2e;
-    border-left: 1px solid #2a2a4a;
-    display: flex;
+    border: 1px solid #3a3a5a;
+    border-radius: 10px;
+    display: none;
     flex-direction: column;
     z-index: 9999;
     font-family: 'Segoe UI', system-ui, sans-serif;
     font-size: 14px;
     color: #e0e0e0;
-    box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    overflow: hidden;
+    resize: both;
+}
+
+#axis-espaco-panel.axis-visible {
+    display: flex;
 }
 
 .axis-espaco-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
+    padding: 8px 14px;
     background: #16213e;
     border-bottom: 1px solid #2a2a4a;
     flex-shrink: 0;
+    cursor: move;
+    user-select: none;
 }
 
 .axis-espaco-title {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px;
     color: #7c83ff;
     letter-spacing: 0.5px;
+    pointer-events: none;
 }
 
 .axis-espaco-header-actions {
     display: flex;
     gap: 6px;
+    pointer-events: auto;
 }
 
 .axis-btn {
@@ -302,30 +318,41 @@
 }
 
 .axis-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
     background: #7c83ff;
     color: #fff;
     border: none;
-    border-radius: 4px;
-    padding: 6px 14px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    margin: 4px;
+    font-size: 20px;
+    font-weight: 700;
+    z-index: 9998;
+    box-shadow: 0 4px 16px rgba(124,131,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .axis-toggle-btn:hover {
-    background: #6b72ee;
+    transform: scale(1.1);
+    box-shadow: 0 6px 24px rgba(124,131,255,0.6);
 }
 
 .axis-toggle-btn.axis-active {
     background: #2a2a4a;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 .axis-systems-panel {
     position: absolute;
     right: 0;
-    top: 44px;
-    width: 340px;
+    top: 40px;
+    width: 320px;
     max-height: 60vh;
     background: #1a1a2e;
     border: 1px solid #3a3a5a;
@@ -416,10 +443,4 @@
 @keyframes axis-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
-}
-
-@media (max-width: 500px) {
-    #axis-espaco-panel {
-        width: 100vw;
-    }
 }
