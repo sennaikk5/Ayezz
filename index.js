@@ -1193,6 +1193,11 @@ eventSource.on(event_types.APP_READY, () => {
     createAprimorarIndicator();
 });
 
+// Garante que o painel apareça mesmo se a extensão for carregada
+// depois que o evento APP_READY já disparou (ex: instalação/reload manual)
+createEspacoPanel();
+createAprimorarIndicator();
+
 eventSource.on(event_types.CHAT_CHANGED, () => {
     saveData();
     renderEspacoChat();
