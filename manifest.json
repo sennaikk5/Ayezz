@@ -1,0 +1,13 @@
+{
+    "display_name": "Spade — Sistema Vivo",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Senna",
+    "version": "6.8.0",
+    "homePage": "",
+    "auto_update": false,
+    "generate_interceptor": "Spade_interceptGeneration"
+}
